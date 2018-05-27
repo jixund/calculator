@@ -138,7 +138,7 @@ function backspace() {
 }
 
 function equalOperation() {
-	
+
 }
 
 function userInput(e) {
@@ -253,8 +253,19 @@ let rightParenthesisSwitch = false;
 let decimalSwitch = false;
 let operatorSwitch = false;
 let displayArray = [];
-let parenthesisArray = [];
 let operationLocation = [];
+
+let leftParenthesisArray = [];
+let rightParenthesisArray = [];
+let operatorArray = [];
+let cleanedOperatorArray = [];
+
+let pemdasedOperatorArray = [];
+let cleanedParenthesisArray = [];
+let numberArray = [];
+
+let calculationArray = [];
+
 
 //Clear the display.
 clearDisplay();
@@ -262,3 +273,148 @@ clearDisplay();
 //Add input listener
 const squares = document.querySelectorAll('.square');
 squares.forEach(square => square.addEventListener('click', userInput));
+
+
+function equalOperator() {
+	parenthesisCleaner();
+	operatorCleaner();
+	pemdas();
+	numberArrayConstructor();
+	calculationArrayConstructor();
+
+
+}
+
+function calculationArrayConstructor() {
+	//Iterate through pemdased operation array
+	for(i=0;i<pemdasedOperatorArray.length;i++){
+		calculationArray.push(); 
+	}
+
+}
+
+function whereIsTheDecimal(numberInArrayForm) {
+	let decimalLocation = 0;
+	while(numberInArrayForm[decimalLocation] != '.'){
+		decimalLocation++;
+		if(decimalLocation == numberInArrayForm.length -1){
+			return numberInArrayForm.length;
+		}
+	}
+	return decimalLocation;
+
+}
+
+function stringToNumber(numberInArrayForm,locationOfDecimal){
+	let arrayOfNumbers = [];
+	let index = numberInArrayForm.length;
+	let result = 0;
+	for(i=0;i<index;i++){
+		if(i == locationOfDecimal){
+			continue;
+		}
+		arrayOfNumbers.push(parseFloat(numberInArrayForm[i])*Math.pow(10,i));
+	}
+	for(j=0;j<arrayOfNumbers.length;j++){
+		result += arrayOfNumbers[j];
+	}
+	return result;
+}
+
+function numberArrayConstructor() {
+	temporaryNumber = [];
+	for(i=0; i<displayArray.length; i++){
+		if(displayArray[i]='.'){
+			temporaryNumber.push();
+		} else if(operatorCheck(displayArray[i]) || rightParenthesisCheck(displayArray[i]) || leftParenthessiCheck(displayArray[i])){
+			continue;
+		} else {
+			while(!(operatorCheck(displayArray[i]) || rightParenthesisCheck(displayArray[i]) || leftParenthessiCheck(displayArray[i]))){
+				temporaryNumber.push(displayArray[i]);
+				i++;
+			}
+			let decimalLocation = whereIsTheDecimal(temporaryNumber);
+			let number = stringToNumber(temporaryNumber,decimalLocation);
+		}
+	}
+}
+
+function pemdas() {
+	//Iterate through cleaned operation array and pemdas all operation arrays.
+	for(i=0; i < cleanedOperatorArray.length; i++){
+		let operationStringLength = cleanedOperatorArray[i].length;
+		let selectedOperatorArray = cleanedOperatorArray[i];
+		let temporaryOperatorStorage = [];
+		for(j=0; j < operationStringLength; j++){
+			//If the operator is + or -, put to the back of the array. Else, put to the front of the array.
+			if(selectedOperatorArray[0][j]=='+' || selectedOperatorArray[0][j] =='-'){
+				temporaryOperatorStorage.push([selectedOperatorArray[0][j],selectedOperatorArray[1][j]]);
+			} else{
+				temporaryOperatorStorage.unshift([selectedOperatorArray[0][j],selectedOperatorArray[1][j]]);
+			}
+		}
+		pemdasedOperatorArray.push(temporaryOperatorStorage);
+		temporaryOperatorStorage = [];
+	}
+}
+
+//Orders the operation so that the first array of operations in cleanedOperatorArray is the first set of operations that should occur
+function operatorCleaner() {
+	let temporaryOperatorStorage = [];
+	if (cleanedParenthesisArray == [])  {
+		for(j = 0; j < operatorArray.length; j++){
+				temporaryOperatorStorage.push(operatorArray[j]); 
+			}
+			cleanedOperatorArray.push(temporaryOperatorStorage);
+			temporaryOperatorStorage = [];
+	} else {
+		for(i = 0; i < cleanedParenthesisArray.length; i++){
+			for(j = 0; j < operatorArray.length; j++){
+				if(operatorArray[j][1] >= cleanedParenthesisArray[i][0] && operatorArray[j][1] <= cleanedParenthesisArray[i][1]){
+					temporaryOperatorStorage.push(operatorArray[j]);
+				}
+			}
+			cleanedOperatorArray.push(temporaryOperatorStorage);
+			temporaryOperatorStorage = [];
+		} 		
+	}
+}
+
+
+function parenthesisCleaner() {
+	while(rightParenthesisArray.length > 0){
+		let currentLeftParenthesisMax = leftParenthesisMax();
+		let currentRightParenthesisMax = rightParenthesisMax();
+
+		parenthesisArray.unshift([currentLeftParenthesisMax[0],currentRightParenthesisMax[0]]);
+		leftParenthesisArray.splice(currentLeftParenthesisMax[1],1);
+		rightParenthesisArray.splilce(currentRightParenthesisMax[1],1);
+
+	}
+}
+
+function leftParenthesisMax() {
+	let max = [0,0];
+
+	for(i=0;i<leftParenthesisArray.length ; i++) {
+		if(leftParenthesisArray[0][i] > max) {
+			max[0] = leftParenthesisArray[0][i];
+			max[1] = leftParenthesisArray[1][i];
+		}
+	}
+
+	return max;
+}
+
+function rightParenthesisMax() {
+	let max = [0,0];
+	
+	for(i=0;i<rightParenthesisArray.length ; i++) {
+		if(rightParenthesisArray[0][i] > max) {
+			max[0] = rightParenthesisArray[0][i];
+			max[1] = rightParenthesisArray[1][i];
+		}
+	}	
+
+	return max;
+}
