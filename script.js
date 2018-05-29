@@ -259,10 +259,11 @@ let leftParenthesisArray = [];
 let rightParenthesisArray = [];
 let operatorArray = [];
 let cleanedOperatorArray = [];
+let numberArray = [];
 
 let pemdasedOperatorArray = [];
 let cleanedParenthesisArray = [];
-let numberArray = [];
+let cleanedNumberArray = [];
 
 let calculationArray = [];
 
@@ -280,6 +281,7 @@ function equalOperator() {
 	operatorCleaner();
 	pemdas();
 	numberArrayConstructor();
+	numberArrayCleaner();
 	calculationArrayConstructor();
 
 
@@ -291,6 +293,33 @@ function calculationArrayConstructor() {
 		calculationArray.push(); 
 	}
 
+}
+
+//Iterate through the number array.
+function distanceFromOperation(cleanedOperation){
+	let leftDistance = 0;
+	let rightDistance = 0;
+	let operationDistanceArray = [];
+	let neighborhoodArray = [];
+	for(i=0; i<numberArray.length;i++){
+		leftDistance = Math.abs(cleanedOperation[1] - numberArray[i][1]);
+		rightDistance = Math.abs(cleanedOperation[1] - numberAray[i][2]);
+		operationDistanceArray.push(Math.min(leftDistance,rightDistance));
+	}
+	let minDistance = Math.min(...operationDistanceArray);
+	let numberWithMinDistance = 0;
+	for(j=0; j<operationDistanceArray.length; j++){
+		//Save spot
+	}
+
+}
+
+//Iterate through the operators
+function numberArrayCleaner() {
+	let distanceArray = [];
+	for(i=0;i < pemdasedOperatorArray.length; i++){
+		distanceArray.push(distanceFromOperation(pemdasedOperatorArray[i]));
+	}
 }
 
 function whereIsTheDecimal(numberInArrayForm) {
@@ -324,18 +353,24 @@ function stringToNumber(numberInArrayForm,locationOfDecimal){
 function numberArrayConstructor() {
 	temporaryNumber = [];
 	for(i=0; i<displayArray.length; i++){
-		if(displayArray[i]='.'){
-			temporaryNumber.push();
-		} else if(operatorCheck(displayArray[i]) || rightParenthesisCheck(displayArray[i]) || leftParenthessiCheck(displayArray[i])){
+		let leftLocationOfNumber = i;
+		if(operatorCheck(displayArray[i]) || rightParenthesisCheck(displayArray[i]) || leftParenthessiCheck(displayArray[i])){
 			continue;
 		} else {
-			while(!(operatorCheck(displayArray[i]) || rightParenthesisCheck(displayArray[i]) || leftParenthessiCheck(displayArray[i]))){
+			while(!(operatorCheck(displayArray[i]) || rightParenthesisCheck(displayArray[i]) || leftParenthessiCheck(displayArray[i])) && i < displayArray.length){
 				temporaryNumber.push(displayArray[i]);
 				i++;
 			}
-			let decimalLocation = whereIsTheDecimal(temporaryNumber);
-			let number = stringToNumber(temporaryNumber,decimalLocation);
 		}
+		let decimalLocation = whereIsTheDecimal(temporaryNumber);
+		let number = stringToNumber(temporaryNumber,decimalLocation);
+		let rightLocationOfNumber = i;
+		if(rightLocationOfNumber != displayArray.length){
+			numberArray.push([number, leftLocationOfNumber, rightLocationOfNumber]);
+		} else {
+			numberArray.push([number, leftLocationOfNumber, rightLocationOfNumber - 1]);
+		}
+		temporaryNumber = [];
 	}
 }
 
