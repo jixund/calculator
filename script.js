@@ -278,49 +278,45 @@ squares.forEach(square => square.addEventListener('click', userInput));
 
 function equalOperator() {
 	parenthesisCleaner();
+	operationArrayConstructor();
 	operatorCleaner();
 	pemdas();
 	numberArrayConstructor();
-	numberArrayCleaner();
 	calculationArrayConstructor();
+	calculate();
 
+}
 
+function calculate() {
+	for(i=calculationArray.length -3; i > -1 ; i--){
+		let tempValue=0;
+		if(operatorCheck(calculationArray[i]){
+			tempValue = operate( calculationArray[i+1],calculationArray[i+2],calculationArray[i] );
+			calculationArray.splice(i,3,tempValue);
+		}
+	}
 }
 
 function calculationArrayConstructor() {
 	//Iterate through pemdased operation array
 	for(i=0;i<pemdasedOperatorArray.length;i++){
-		calculationArray.push(); 
+		let numberLength = numberArray.length;
+		for(j=0;j<numberLength;j++){
+			if( (pemdasedOperatorArray[i][1]+1 == numberArray[j][1]) ||
+				(pemdasedOperatorArray[i][1]-1 == numberArray[j][1]) ||
+				(pemdasedOperatorArray[i][1]+1 == numberArray[j][2]) ||
+				(pemdasedOperatorArray[i][1]-1 == numberArray[j][2]) ){
+				calculationArray.unshift(numberArray[j][0]);
+			}
+			numberArray.splice(j,1);
+		}
+		calculationArray.unshift(pemdasedOperatorArray[i][0]);
 	}
+
+
 
 }
 
-//Iterate through the number array.
-function distanceFromOperation(cleanedOperation){
-	let leftDistance = 0;
-	let rightDistance = 0;
-	let operationDistanceArray = [];
-	let neighborhoodArray = [];
-	for(i=0; i<numberArray.length;i++){
-		leftDistance = Math.abs(cleanedOperation[1] - numberArray[i][1]);
-		rightDistance = Math.abs(cleanedOperation[1] - numberAray[i][2]);
-		operationDistanceArray.push(Math.min(leftDistance,rightDistance));
-	}
-	let minDistance = Math.min(...operationDistanceArray);
-	let numberWithMinDistance = 0;
-	for(j=0; j<operationDistanceArray.length; j++){
-		//Save spot
-	}
-
-}
-
-//Iterate through the operators
-function numberArrayCleaner() {
-	let distanceArray = [];
-	for(i=0;i < pemdasedOperatorArray.length; i++){
-		distanceArray.push(distanceFromOperation(pemdasedOperatorArray[i]));
-	}
-}
 
 function whereIsTheDecimal(numberInArrayForm) {
 	let decimalLocation = 0;
@@ -382,10 +378,10 @@ function pemdas() {
 		let temporaryOperatorStorage = [];
 		for(j=0; j < operationStringLength; j++){
 			//If the operator is + or -, put to the back of the array. Else, put to the front of the array.
-			if(selectedOperatorArray[0][j]=='+' || selectedOperatorArray[0][j] =='-'){
-				temporaryOperatorStorage.push([selectedOperatorArray[0][j],selectedOperatorArray[1][j]]);
+			if(selectedOperatorArray[j][0]=='+' || selectedOperatorArray[j][0] =='-'){
+				temporaryOperatorStorage.push(selectedOperatorArray[j]);
 			} else{
-				temporaryOperatorStorage.unshift([selectedOperatorArray[0][j],selectedOperatorArray[1][j]]);
+				temporaryOperatorStorage.unshift(selectedOperatorArray[j]);
 			}
 		}
 		pemdasedOperatorArray.push(temporaryOperatorStorage);
@@ -415,6 +411,13 @@ function operatorCleaner() {
 	}
 }
 
+function operationArrayConstructor() {
+	for(i=0;i<displayArray.length;i++){
+		if(operatorCheck(displayArray[i])){
+			operatorArray.push([displayArray[i],i]);
+		}
+	}
+}
 
 function parenthesisCleaner() {
 	while(rightParenthesisArray.length > 0){
